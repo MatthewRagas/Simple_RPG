@@ -9,7 +9,11 @@ namespace Simple_RPG
     class Game
     {
         string playerName = "";
-        int playerHealth = 100;
+        int playerMaxHealth = 100;
+        int playerCurrentHealth = 100;
+        int healAbility = 50;
+        int healAbilityCharge = 3;
+        int deadMonsters = 0;
         int playerAttack = 25;
 
 
@@ -40,26 +44,38 @@ namespace Simple_RPG
         {
            
             Console.WriteLine("");
-            Console.WriteLine("A wild thing appears!");
+            Console.WriteLine("A wild Sir appears!");
 
-            string action = "";
-            Console.WriteLine("What is the plan bose? (fight/flight)");
-            action = Console.ReadLine();
-
-            if (action == "fight" || action == "Fight")
+            //loop of the fight option;
+            while (playerCurrentHealth > 0 && monsterHealth > 0)
             {
-                //loop of the fight option;
-                while(playerHealth > 0 && monsterHealth > 0)
+                string action = "";
+                
+                if (playerCurrentHealth > playerMaxHealth * 0.33)
                 {
+                    Console.WriteLine("What is the plan bose? (fight/flight)");
+                }
+                else if(playerCurrentHealth < playerMaxHealth * 0.33)
+                {
+                    Console.WriteLine("What is the plan bose? (fight/flight/heal)");
+                }
+
+                action = Console.ReadLine();
+
+                if (action == "fight" || action == "Fight")
+                {
+
+
+
                     //monster attacks player;
                     Console.WriteLine("The  monster attacks! " + playerName + " takes "
                         + monsterDamage + "damage.");
 
-                    playerHealth -= monsterDamage;
+                    playerCurrentHealth -= monsterDamage;
 
-                    Console.WriteLine(playerName + " has " + playerHealth +
+                    Console.WriteLine(playerName + " has " + playerCurrentHealth +
                         " health remaining.");
-                    if (playerHealth <= 0)
+                    if (playerCurrentHealth <= 0)
                     {
                         Console.WriteLine("You have been defeated. \n Game Over.");
                         Console.ReadKey();
@@ -71,16 +87,28 @@ namespace Simple_RPG
                     Console.WriteLine(playerName + " attacks The monster.");
 
                     monsterHealth -= playerAttack;
-                    Console.WriteLine("The monster has " + monsterHealth + " Remaining");                    
+                    Console.WriteLine("The monster has " + monsterHealth + " Remaining");
 
                 }
+                else if (action == "flight" || action == "Flight")
+                {
+                    //escape;
+                    Console.WriteLine("You flapped your arms fast enough...");
+                }
+                else if(action == "heal" || action == "Heal")
+                {
+                    //player heal ability;
+                    playerCurrentHealth += healAbility;
 
-                
-            }
-            else if (action == "flight" || action == "Flight")
-            {
-                //escape
-                Console.WriteLine("You flapped your arms fast enough...");
+                    //checks if health goes over max health;
+                    if (playerCurrentHealth > playerMaxHealth)
+                    {
+                        playerCurrentHealth = playerMaxHealth;
+                    }
+
+                    Console.WriteLine("You heal yourself to " + playerCurrentHealth + " health.");
+                    Console.ReadKey();
+                }
             }
 
             return true;
