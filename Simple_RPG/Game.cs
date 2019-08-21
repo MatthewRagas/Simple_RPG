@@ -13,8 +13,12 @@ namespace Simple_RPG
         int playerCurrentHealth = 100;
         int healAbility = 50;
         int healAbilityCharge = 3;
+        int healAbilityMax = 3;
         int deadMonsters = 0;
         int playerAttack = 25;
+        int fleeCount = 2;
+        int fleeCountMax = 2;
+        int fleeCooldown = 0;
 
 
         public void Start()
@@ -26,7 +30,7 @@ namespace Simple_RPG
            //fight until you lose;
             while (alive)
             {
-               alive = Encounter(13, 150);
+               alive = Encounter(49, 150);
             }
 
             Console.ReadKey();
@@ -40,7 +44,7 @@ namespace Simple_RPG
             Console.WriteLine("Welcome! " + playerName + ".");
         }
         //Monster Encounter
-        bool Encounter(int monsterDamage, int monsterHealth)
+        bool Encounter( int monsterDamage, int monsterHealth)
         {
            
             Console.WriteLine("");
@@ -55,64 +59,140 @@ namespace Simple_RPG
                 {
                     Console.WriteLine("What is the plan bose? (fight/flight)");
                 }
-                else if(playerCurrentHealth < playerMaxHealth * 0.33)
+                else if(playerCurrentHealth <= playerMaxHealth * 0.33)
                 {
-                    Console.WriteLine("What is the plan bose? (fight/flight/heal)");
+                    Console.WriteLine("What is the plan bose? (fight/flight/heal "
+                        + healAbilityCharge +" charges)");
                 }
 
                 action = Console.ReadLine();
 
                 if (action == "fight" || action == "Fight")
                 {
-
-
-
-                    //monster attacks player;
-                    Console.WriteLine("The  monster attacks! " + playerName + " takes "
-                        + monsterDamage + "damage.");
-
-                    playerCurrentHealth -= monsterDamage;
-
-                    Console.WriteLine(playerName + " has " + playerCurrentHealth +
-                        " health remaining.");
-                    if (playerCurrentHealth <= 0)
-                    {
-                        Console.WriteLine("You have been defeated. \n Game Over.");
-                        Console.ReadKey();
-                        return false;
-                    }
-                    Console.ReadKey();
-
-                    //player attacks monster;
-                    Console.WriteLine(playerName + " attacks The monster.");
-
-                    monsterHealth -= playerAttack;
-                    Console.WriteLine("The monster has " + monsterHealth + " Remaining");
-
+                    return Fight(ref monsterDamage, ref monsterHealth);
                 }
                 else if (action == "flight" || action == "Flight")
                 {
-                    //escape;
-                    Console.WriteLine("You flapped your arms fast enough...");
+
+                    return Flee(ref monsterDamage, ref monsterHealth);
                 }
                 else if(action == "heal" || action == "Heal")
                 {
-                    //player heal ability;
-                    playerCurrentHealth += healAbility;
-
-                    //checks if health goes over max health;
-                    if (playerCurrentHealth > playerMaxHealth)
-                    {
-                        playerCurrentHealth = playerMaxHealth;
-                    }
-
-                    Console.WriteLine("You heal yourself to " + playerCurrentHealth + " health.");
-                    Console.ReadKey();
+                    Heal(ref monsterHealth, ref monsterDamage);
                 }
+                
+               
             }
 
             return true;
 
+        }
+
+        bool Fight(ref int monsterDamage, ref int monsterHealth)
+        {
+
+            //monster attacks player;
+            Console.WriteLine("The  monster attacks! " + playerName + " takes "
+                + monsterDamage + "damage.");
+
+            playerCurrentHealth -= monsterDamage;
+
+            Console.WriteLine(playerName + " has " + playerCurrentHealth +
+                " health remaining.");
+
+            //player defeat/game over.
+            if (playerCurrentHealth <= 0)
+            {
+                Console.WriteLine("You have been defeated. \n Game Over.");
+                Console.ReadKey();
+                return false;
+            }
+            Console.ReadKey();
+
+            //player attacks monster;
+            Console.WriteLine(playerName + " attacks The monster.");
+
+            monsterHealth -= playerAttack;
+            playerCurrentHealth += 6;
+            Console.WriteLine("The monster has " + monsterHealth + " Remaining");
+            return true;
+        }
+
+        bool Flee(ref int monsterDamage, ref int monsterHealth)
+        {
+            //escape;
+
+            fleeCount--;
+
+            if(fleeCount > 0)
+            {
+                Console.WriteLine("You flapped your arms fast enough..." +
+                "\n You bought enough time to regen 20 health.\n You have " + fleeCount +
+                " flights remainging.");
+                playerCurrentHealth += 20;
+                if (playerCurrentHealth > playerMaxHealth)
+                {
+                    playerCurrentHealth = playerMaxHealth;
+                }
+
+                monsterHealth = 150;
+                fleeCooldown++;
+
+                if (fleeCooldown == 2)
+                {
+                    fleeCount++;
+                }
+
+                if (fleeCount > fleeCountMax)
+                {
+                    fleeCount = fleeCountMax;
+                }
+
+                else
+                {
+                    playerCurrentHealth -= monsterDamage;
+                    Console.WriteLine("Your flight failed. The sir lands an attack.\n " +
+                        "you have " + playerCurrentHealth + " health remaining.");
+                }
+            }
+            
+
+            return true;
+        }
+
+        bool Heal(ref int monsterDamage, ref int monsterHealth)
+        {
+            //player heal ability;
+            if (healAbilityCharge > 0)
+            {
+                playerCurrentHealth += healAbility;
+                healAbilityCharge--;
+            }
+
+            //checks if current health goes over max health;
+            if (playerCurrentHealth > playerMaxHealth)
+            {
+                playerCurrentHealth = playerMaxHealth;
+            }
+
+            Console.WriteLine("You heal yourself to " + playerCurrentHealth + " health.\n"
+                + healAbilityCharge + " heal charges remaining");
+            Console.ReadKey();
+
+            //Code to keep track of heal charges;
+            if (monsterHealth <= 0)
+            {
+                deadMonsters++;
+            }
+
+            if (deadMonsters == 3)
+            {
+                healAbilityCharge++;
+                deadMonsters = 0;
+                if (healAbilityCharge >= healAbilityMax)
+                    healAbilityCharge = healAbilityMax;
+            }
+            return true;
         }
     }
 }
