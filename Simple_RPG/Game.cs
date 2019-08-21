@@ -10,7 +10,43 @@ namespace Simple_RPG
     {
         public void Start()
         {
-            Console.WriteLine("Welcome!");
-            Console.ReadKey();        }
+            string playerName = "";
+            int playerHealth = 100;
+
+            //asks player for name. and assigns name to player;
+            Console.WriteLine("What is your name? ");
+            playerName = Console.ReadLine();
+            Console.WriteLine("Welcome! " + playerName + ".");
+
+            //Monster Encounter
+            int monsterDamage = 13;
+            Console.WriteLine("");
+            Console.WriteLine("A wild thing appears!");
+
+            string action = "";
+            Console.WriteLine("What is the plan bose? (fight/flight)");
+            action = Console.ReadLine();
+
+            if (action == "fight" || action == "Fight")
+            {
+                //monster attacks player;
+                Console.WriteLine("The  monster attacks! " + playerName + " takes "
+                    + monsterDamage + "damage.");
+
+                playerHealth = playerHealth - monsterDamage;
+
+                Console.WriteLine(playerName + " has " + playerHealth +
+                    " health remaining.");
+                //player attacks monster;
+                Console.WriteLine(playerName + " attacks! The monster is defeated.");
+            }
+            else if (action == "flight" || action == "Flight")
+            {
+                //escape
+                Console.WriteLine("You flapped your arms fast enough...");
+            }
+
+            Console.ReadKey();
+       }
     }
 }
